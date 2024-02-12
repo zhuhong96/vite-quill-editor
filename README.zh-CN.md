@@ -2,32 +2,28 @@
   <!-- 🔥 <a href="https://">文档网站（国内）</a>
   &nbsp;
   &nbsp; -->
-  🇨🇳 <a href="./README.zh-CN.md">中文版介绍</a>
+  🇨🇳 <a href="./README.md">英文版介绍</a>
 </p>
 
 
-
-
-## Install
-
+## 安装
 
 ```bash
 npm i vite-quill-editor --save
 ```
 
-## Usage
+## 使用
 
-Global introduction
+全局使用
 
 ```bash
 import QuillEditor from 'vite-quill-editor';
 import "vite-quill-editor/index.css";
 const app = createApp(App);
-
 app.use(QuillEditor).mount('#app')
 ```
 
-Component introduction
+组件使用
 
 ```bash
 import { QuillEditor } from 'vite-quill-editor';

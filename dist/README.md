@@ -1,49 +1,41 @@
-# 这是一个富文本的md文档
+<p align="center">
+  <!-- 🔥 <a href="https://">文档网站（国内）</a>
+  &nbsp;
+  &nbsp; -->
+  🇨🇳 <a href="./README.zh-CN.md">中文版介绍</a>
+</p>
 
-这是一个简单的文档，用于演示如何使用Markdown语法。
 
-## 标题
 
-这是一个二级标题。
 
-### 三级标题
+## Install
 
-这是一个三级标题。
 
-## 文本
+```bash
+npm i vite-quill-editor --save
+```
 
-这是一个普通文本。
+## Usage
 
-### 粗体和斜体
+Global introduction
 
-这是一个粗体文本：**这是粗体**。
+```bash
+import QuillEditor from 'vite-quill-editor';
+import "vite-quill-editor/index.css";
+const app = createApp(App);
 
-这是一个斜体文本：*这是斜体*。
+app.use(QuillEditor).mount('#app')
+```
 
-### 列表
+Component introduction
 
-这是一个无序列表：
+```bash
+import { QuillEditor } from 'vite-quill-editor';
+import "vite-quill-editor/index.css";
+```
 
-- 项目1
-- 项目2
-- 项目3
+html
 
-这是一个有序列表：
-
-1. 项目1
-2. 项目2
-3. 项目3
-
-### 链接
-
-这是一个链接：[百度](https://www.baidu.com)
-
-### 图片
-
-这是一个图片：
-
-![图片描述](https://picsum.photos/300/200)
-
-## 代码
-
-这是一个简单的JavaScript代码：
+```bash
+ <quill-editor />
+```
