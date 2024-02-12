@@ -11572,10 +11572,11 @@ var quill = { exports: {} };
 })(quill);
 var quillExports = quill.exports;
 const Quill = /* @__PURE__ */ getDefaultExportFromCjs(quillExports);
-const _withScopeId = (n) => (pushScopeId("data-v-1ec82af9"), n = n(), popScopeId(), n);
-const _hoisted_1 = /* @__PURE__ */ _withScopeId(() => /* @__PURE__ */ createElementVNode("div", { id: "vite-quill-editor" }, null, -1));
-const _hoisted_2 = [
-  _hoisted_1
+const _withScopeId = (n) => (pushScopeId("data-v-1612db8f"), n = n(), popScopeId(), n);
+const _hoisted_1 = { class: "quill-editor" };
+const _hoisted_2 = /* @__PURE__ */ _withScopeId(() => /* @__PURE__ */ createElementVNode("div", { id: "vite-quill-editor" }, null, -1));
+const _hoisted_3 = [
+  _hoisted_2
 ];
 const _sfc_main = /* @__PURE__ */ defineComponent({
   __name: "quillEditor",
@@ -11603,7 +11604,7 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
     });
     __expose({});
     return (_ctx, _cache) => {
-      return openBlock(), createElementBlock("div", null, _hoisted_2);
+      return openBlock(), createElementBlock("div", _hoisted_1, _hoisted_3);
     };
   }
 });
@@ -11614,7 +11615,7 @@ const _export_sfc = (sfc, props) => {
   }
   return target;
 };
-const quillEditor = /* @__PURE__ */ _export_sfc(_sfc_main, [["__scopeId", "data-v-1ec82af9"]]);
+const quillEditor = /* @__PURE__ */ _export_sfc(_sfc_main, [["__scopeId", "data-v-1612db8f"]]);
 quillEditor.install = (app) => {
   app.component(quillEditor.__name, quillEditor);
 };
