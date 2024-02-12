@@ -1,0 +1,29 @@
+{
+  "name": "vite-quill-editor",
+  "version": "1.0.1",
+  "description": "富文本编辑器",
+  "main": "./lib/vite-quill-editor.umd.cjs",
+  "module": "./lib/vite-quill-editor.js",
+  "exports": {
+    "./index.css": "./lib/style.css",
+    ".": {
+      "import": "./lib/vite-quill-editor.js",
+      "require": "./lib/vite-quill-editor.umd.cjs"
+    }
+  },
+  "keywords": [
+    "vite-quill-editor",
+    "quill-editor",
+    "quill",
+    "富文本编辑器",
+    "富文本"
+  ],
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "朱洪",
+  "license": "MIT"
+}
