@@ -11627,6 +11627,6 @@ const viteQuillEditor = {
   install
 };
 export {
-  quillEditor as Editor,
+  quillEditor as QuillEditor,
   viteQuillEditor as default
 };

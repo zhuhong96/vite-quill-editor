@@ -1,8 +1,8 @@
 import type { App } from 'vue';
-import Editor from './editor';
+import QuillEditor from './editor';
 
 // 所有组件列表
-const components = [ Editor ];
+const components = [ QuillEditor ];
 
 // 定义 install 方法
 const install = (app: App): void => {
@@ -18,7 +18,7 @@ const install = (app: App): void => {
 }
 
 export {
-  Editor
+  QuillEditor
 }
 
 const viteQuillEditor = {

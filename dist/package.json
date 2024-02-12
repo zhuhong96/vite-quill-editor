@@ -1,6 +1,6 @@
 {
   "name": "vite-quill-editor",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "富文本编辑器",
   "main": "./lib/vite-quill-editor.umd.cjs",
   "module": "./lib/vite-quill-editor.js",
