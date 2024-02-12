@@ -18,6 +18,8 @@
     "build": "vue-tsc && vite build",
     "preview": "vite preview"
   },
+  "author": "朱洪",
+  "license": "MIT",
   "dependencies": {
     "@vitejs/plugin-vue-jsx": "^3.1.0",
     "vue": "^3.4.15"

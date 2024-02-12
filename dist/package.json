@@ -18,6 +18,7 @@
     "富文本编辑器",
     "富文本"
   ],
+  "repository": "https://github.com/zh317626/vite-quill-editor",
   "directories": {
     "lib": "lib"
   },
