@@ -1,0 +1,33 @@
+{
+  "name": "vite-quill-editor",
+  "private": false,
+  "version": "0.1.0",
+  "type": "module",
+  "main": "./dist/vite-quill-editor.umd.cjs",
+  "module": "./dist/vite-quill-editor.js",
+  "exports": {
+    "./dist/index.css": "./dist/style.css",
+    "./index.css": "./dist/style.css",
+    ".": {
+      "import": "./dist/vite-quill-editor.js",
+      "require": "./dist/vite-quill-editor.cjs"
+    }
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vue-tsc && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@vitejs/plugin-vue-jsx": "^3.1.0",
+    "vue": "^3.4.15"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.17",
+    "@vitejs/plugin-vue": "^5.0.4",
+    "terser": "^5.27.0",
+    "typescript": "^5.2.2",
+    "vite": "^5.1.0",
+    "vue-tsc": "^1.8.27"
+  }
+}
