@@ -11572,7 +11572,7 @@ var quill = { exports: {} };
 })(quill);
 var quillExports = quill.exports;
 const Quill = /* @__PURE__ */ getDefaultExportFromCjs(quillExports);
-const _withScopeId = (n) => (pushScopeId("data-v-958b7526"), n = n(), popScopeId(), n);
+const _withScopeId = (n) => (pushScopeId("data-v-1ec82af9"), n = n(), popScopeId(), n);
 const _hoisted_1 = /* @__PURE__ */ _withScopeId(() => /* @__PURE__ */ createElementVNode("div", { id: "vite-quill-editor" }, null, -1));
 const _hoisted_2 = [
   _hoisted_1
@@ -11614,7 +11614,7 @@ const _export_sfc = (sfc, props) => {
   }
   return target;
 };
-const quillEditor = /* @__PURE__ */ _export_sfc(_sfc_main, [["__scopeId", "data-v-958b7526"]]);
+const quillEditor = /* @__PURE__ */ _export_sfc(_sfc_main, [["__scopeId", "data-v-1ec82af9"]]);
 quillEditor.install = (app) => {
   app.component(quillEditor.__name, quillEditor);
 };

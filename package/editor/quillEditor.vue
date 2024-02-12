@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="quill-editor">
     <div id="vite-quill-editor"></div>
   </div>
 </template>
@@ -8,7 +8,6 @@
 // 引入
 import Quill from "quill";
 import { onMounted } from "vue";
-// import 'quill/dist/quill.snow.css';
 
 onMounted(() => {
   const options = {
@@ -37,12 +36,5 @@ defineExpose({});
 </script>
 
 <style scoped>
-/* @import 'quill/dist/quill.snow.css'; */
-/* @import 'quill/dist/quill.bubble.css'; */
-
-#vite-quill-editor {
-  width: 100%;
-  min-height: 200px;
-  /* background-color: red; */
-}
+@import "../style/quillEditor.css";
 </style>
