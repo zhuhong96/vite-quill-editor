@@ -29,6 +29,8 @@ onMounted(() => {
     theme: "snow",
   };
   const editor = new Quill("#vite-quill-editor", options);
+  console.log(editor);
+  
 });
 
 defineExpose({});
