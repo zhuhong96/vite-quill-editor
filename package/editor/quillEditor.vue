@@ -7,9 +7,13 @@
 <script lang="ts" setup>
 // 引入
 import Quill from "quill";
-import { onMounted } from "vue";
+import { onMounted, ref } from "vue";
 
-onMounted(() => {
+// quill实例
+const quillEditor = ref<Quill | null>(null);
+
+// 初始化
+const init = () => {
   const options = {
     debug: "info",
     modules: {
@@ -27,9 +31,22 @@ onMounted(() => {
     readOnly: false,
     theme: "snow",
   };
-  const editor = new Quill("#vite-quill-editor", options);
-  console.log(editor);
-  
+  const quillEditor = new Quill("#vite-quill-editor", options);
+  console.log(quillEditor);
+  quillEditor.value = quillEditor;
+  // 监听文本变化
+  quillEditor.value.on("text-change", (delta, oldDelta, source) => {
+    console.log('*************************');
+    
+  });
+  // 监听光标变化
+  quillEditor.value.on("selection-change", (range, oldRange, source) => {
+    
+  })
+}
+
+onMounted(() => {
+  init();
 });
 
 defineExpose({});
