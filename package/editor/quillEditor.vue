@@ -8,9 +8,19 @@
 // 引入
 import Quill from "quill";
 import { onMounted, ref } from "vue";
+import type { PropType } from "vue";
+import { IOptions } from "../enum/quillEditor";
 
 // quill实例
 const quillEditor = ref<Quill | null>(null);
+// props传值
+const props = defineProps({
+  options:{
+    type: Object as PropType<IOptions>,
+    default:()=>{}
+  }
+})
+
 
 // 初始化
 const init = () => {
