@@ -1,5 +1,6 @@
 <template>
   <div class="quill-editor">
+    <toolBar :container="props.options.modules.toolbar.container" />
     <div id="vite-quill-editor"></div>
   </div>
 </template>
@@ -10,11 +11,13 @@ import Quill from "quill";
 import { onMounted, ref } from "vue";
 import type { PropType } from "vue";
 import { IOptions } from "../enum/quillEditor";
+import ToolBar from "../common/toolbar.vue";
 
 // quill实例
 const quillEditor = ref<Quill | null>(null);
 // props传值
 const props = defineProps({
+  // 配置信息
   options:{
     type: Object as PropType<IOptions>,
     default:()=>{}
@@ -41,9 +44,9 @@ const init = () => {
     readOnly: false,
     theme: "snow",
   };
-  const quillEditor = new Quill("#vite-quill-editor", options);
+  const editor = new Quill("#vite-quill-editor", options);
   console.log(quillEditor);
-  quillEditor.value = quillEditor;
+  quillEditor.value = editor;
   // 监听文本变化
   quillEditor.value.on("text-change", (delta, oldDelta, source) => {
     console.log('*************************');

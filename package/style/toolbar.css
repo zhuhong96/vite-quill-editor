@@ -1,0 +1,22 @@
+
+.toolbar-list {
+  width: 30px;
+  height: 32px;
+  color: #595959;
+  background-color: #f1f1f1;
+}
+
+.z-toolbar .z-formats button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: inline-block;
+  /* float: left; */
+  height: 24px;
+  padding: 3px 5px;
+  /* width: 28px; */
+}
+
+.z-toolbar .z-formats button:hover {
+  color: #06c;
+}
