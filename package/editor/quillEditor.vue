@@ -1,6 +1,6 @@
 <template>
   <div class="quill-editor">
-    <toolBar :container="props.options.modules.toolbar.container" />
+    <ToolBar :toolbar="props.options.modules.toolbar" />
     <div id="vite-quill-editor"></div>
   </div>
 </template>
@@ -14,7 +14,7 @@ import { IOptions } from "../enum/quillEditor";
 import ToolBar from "../common/toolbar.vue";
 
 // quill实例
-const quillEditor = ref<Quill | null>(null);
+const quillEditor = ref<any>(null);
 // props传值
 const props = defineProps({
   // 配置信息
@@ -28,18 +28,11 @@ const props = defineProps({
 // 初始化
 const init = () => {
   const options = {
-    debug: "info",
+    // debug: "info", // 是否显示debug信息
     modules: {
-      toolbar: [
-        // 默认的
-        [{ header: [1, 2, 3, false] }],
-        ["bold", "italic", "underline", "link"],
-        [{ list: "ordered" }, { list: "bullet" }],
-        ["clean"],
-        ["image"],
-      ],
+      toolbar: props.options.modules.toolbar,
     },
-    placeholder: "请输入文本",
+    placeholder: props.options?.placeholder || '请输入文本',
     // 是否禁止编辑
     readOnly: false,
     theme: "snow",
@@ -67,4 +60,5 @@ defineExpose({});
 
 <style scoped>
 @import "../style/quillEditor.css";
+@import "../style/quill-default.css";
 </style>

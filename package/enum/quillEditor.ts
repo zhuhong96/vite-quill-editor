@@ -1,11 +1,6 @@
 
-export interface IToolbar {
-  // 工具栏
-  container: any[],
-  handlers: Object
-}
 export interface IModules {
-  toolbar: IToolbar,
+  toolbar: any[],
   clipboard: Object,
 }
 
@@ -14,11 +9,20 @@ export interface IModules {
  */
 export interface IOptions {
   theme: string, // 主题
-  modules: IModules
+  modules: IModules,
+  placeholder: string, // 提示文本
 }
 
 
-export const containerValue = [
+/**
+ * 工具栏逻辑
+ * 根据传递的值, 判断是否存在-->
+ * 如果存在就添加到对象中-->
+ * 并且不管他有多少个,只要添加就展示多少个。
+ * 反之-->不添加其中
+ */
+
+export const containerName = [
   'size', 'header', 'blockquote', 
   'bold', 'italic', 'underline', 
   'strike', 'script', 'font', 'color', 

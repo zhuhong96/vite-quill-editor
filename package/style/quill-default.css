@@ -1,0 +1,5 @@
+
+/* 修改富文本 placeholder 样式 */
+:deep(.ql-editor.ql-blank::before) {
+  font-style: normal;
+}
