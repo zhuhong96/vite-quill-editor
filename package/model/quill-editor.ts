@@ -1,6 +1,8 @@
 
+// 工具栏名称
 export const toolbarTitle:any = [
   ['bold', 'italic', 'strike', 'underline'],
+  ['color','background'],
   // ['blockquote', 'code-block'],
   // [{ 'header': 1 }, { 'header': 2 }],
   // [{ 'list': 'ordered' }, { 'list': 'bullet' }],
@@ -15,3 +17,7 @@ export const toolbarTitle:any = [
   // ['clean'],
   // ['link', 'image', 'formula']
 ]
+
+// 文字大小
+export const fontSizeName = ['14px','15px','16px','18px','20px','24px','28px','36px','48px'] as const;
+export type IFontSizeName = typeof fontSizeName[number];

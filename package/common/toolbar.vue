@@ -28,7 +28,7 @@
 
 <script lang="ts" setup>
 import { PropType, onMounted } from "vue";
-// import { isString, isObject } from "../enum/utils";
+// import { isString, isObject } from "../model/utils";
 import { toolbarTitle } from "../model/quill-editor";
 import IconBold from "../images/svg/bold.vue";
 import IconItalic from "../images/svg/italic.vue";
