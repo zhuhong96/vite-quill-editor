@@ -1,18 +1,29 @@
 
-.z-toolbar {
-  display: flex;
-}
-
 /* 开始--> 修改按钮默认样式 */
 .z-toolbar .z-formats button {
   background: none;
   border: none;
   cursor: pointer;
-  display: inline-block;
-  /* float: left; */
+  padding: unset;
+}
+
+.z-toolbar {
+  display: flex;
+  align-items: center;
+  height: 48px;
+}
+
+.z-toolbar .z-formats {
+  display: flex;
+  gap: 8px;
+}
+
+.icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
   height: 24px;
-  padding: 3px 5px;
-  /* width: 28px; */
 }
 
 .z-toolbar .z-formats button:hover {

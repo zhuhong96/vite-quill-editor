@@ -1,6 +1,6 @@
 <template>
   <div class="quill-editor">
-    <ToolBar :toolbar="props.options.modules.toolbar" />
+    <ToolBar :toolbar="props.options.modules.toolbar" :getQuill="getQuill" />
     <div id="vite-quill-editor"></div>
   </div>
 </template>
@@ -38,24 +38,32 @@ const init = () => {
     theme: "snow",
   };
   const editor = new Quill("#vite-quill-editor", options);
-  console.log(quillEditor);
   quillEditor.value = editor;
+  // console.log(quillEditor.value);
   // 监听文本变化
-  quillEditor.value.on("text-change", (delta, oldDelta, source) => {
-    console.log('*************************');
-    
+  quillEditor.value.on("text-change", (delta:any, oldDelta:any, source:any) => {
+    console.log('*************************',delta,oldDelta,source);
   });
   // 监听光标变化
-  quillEditor.value.on("selection-change", (range, oldRange, source) => {
-    
+  quillEditor.value.on("selection-change", (range:any, oldRange:any, source:any) => {
+    console.log(range,oldRange,source);
   })
 }
+
+// 获取quill实例
+const getQuill = () => {
+  return quillEditor.value;
+};
 
 onMounted(() => {
   init();
 });
 
-defineExpose({});
+defineExpose({
+  getQuill,
+});
+
+
 </script>
 
 <style scoped>

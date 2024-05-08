@@ -2,10 +2,20 @@ import { defineConfig } from 'vite';
 import vue from '@vitejs/plugin-vue';
 import vueJsx from '@vitejs/plugin-vue-jsx';
 import { resolve } from 'path';
+import path from "path" // 需安装此模块
 
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [vue(),vueJsx({})],
+  resolve: {
+    alias: {
+      // 这里就是需要配置resolve里的别名
+      "@": path.join(__dirname, "./package") // path记得引入
+    }
+  },
+  esbuild: {
+    drop: ['console', 'debugger']
+  },
   build: {
     outDir:'dist/lib',
     assetsDir:'assets',

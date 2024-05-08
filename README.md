@@ -1,3 +1,33 @@
+本地运行
+
+```bash
+npm run dev 
+or 
+yarn dev
+```
+
+打包
+
+```bash
+npm run build 
+or 
+yarn build
+```
+
+本地调试(将包安装到本地全局)
+```typescript
+yarn link
+```
+
+本地项目调试
+```typescript
+yarn link vite-quill-editor
+```
+
+
+
+
+
 <p align="center">
   <!-- 🔥 <a href="https://">文档网站（国内）</a>
   &nbsp;

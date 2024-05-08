@@ -1,11 +1,11 @@
-import { defineComponent, onMounted, openBlock, createElementBlock, pushScopeId, popScopeId, createElementVNode } from "vue";
+import { defineComponent, openBlock, createElementBlock, createElementVNode, onMounted, Fragment, renderList, unref, createBlock, createCommentVNode, ref, createVNode, pushScopeId, popScopeId } from "vue";
 var commonjsGlobal = typeof globalThis !== "undefined" ? globalThis : typeof window !== "undefined" ? window : typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : {};
 function getDefaultExportFromCjs(x) {
   return x && x.__esModule && Object.prototype.hasOwnProperty.call(x, "default") ? x["default"] : x;
 }
 var quill = { exports: {} };
 /*!
- * Quill Editor v1.3.6
+ * Quill Editor v1.3.7
  * https://quilljs.com/
  * Copyright (c) 2014, Jason Chen
  * Copyright (c) 2013, salesforce.com
@@ -409,7 +409,19 @@ var quill = { exports: {} };
           Delta.prototype.compose = function(other) {
             var thisIter = op.iterator(this.ops);
             var otherIter = op.iterator(other.ops);
-            var delta = new Delta();
+            var ops = [];
+            var firstOther = otherIter.peek();
+            if (firstOther != null && typeof firstOther.retain === "number" && firstOther.attributes == null) {
+              var firstLeft = firstOther.retain;
+              while (thisIter.peekType() === "insert" && thisIter.peekLength() <= firstLeft) {
+                firstLeft -= thisIter.peekLength();
+                ops.push(thisIter.next());
+              }
+              if (firstOther.retain - firstLeft > 0) {
+                otherIter.next(firstOther.retain - firstLeft);
+              }
+            }
+            var delta = new Delta(ops);
             while (thisIter.hasNext() || otherIter.hasNext()) {
               if (otherIter.peekType() === "insert") {
                 delta.push(otherIter.next());
@@ -430,6 +442,10 @@ var quill = { exports: {} };
                   if (attributes)
                     newOp.attributes = attributes;
                   delta.push(newOp);
+                  if (!otherIter.hasNext() && equal(delta.ops[delta.ops.length - 1], newOp)) {
+                    var rest = new Delta(thisIter.rest());
+                    return delta.concat(rest).chop();
+                  }
                 } else if (typeof otherOp["delete"] === "number" && typeof thisOp.retain === "number") {
                   delta.push(otherOp);
                 }
@@ -572,6 +588,8 @@ var quill = { exports: {} };
         function(module2, exports2) {
           var hasOwn = Object.prototype.hasOwnProperty;
           var toStr = Object.prototype.toString;
+          var defineProperty = Object.defineProperty;
+          var gOPD = Object.getOwnPropertyDescriptor;
           var isArray = function isArray2(arr) {
             if (typeof Array.isArray === "function") {
               return Array.isArray(arr);
@@ -592,6 +610,28 @@ var quill = { exports: {} };
             }
             return typeof key === "undefined" || hasOwn.call(obj, key);
           };
+          var setProperty = function setProperty2(target, options) {
+            if (defineProperty && options.name === "__proto__") {
+              defineProperty(target, options.name, {
+                enumerable: true,
+                configurable: true,
+                value: options.newValue,
+                writable: true
+              });
+            } else {
+              target[options.name] = options.newValue;
+            }
+          };
+          var getProperty = function getProperty2(obj, name) {
+            if (name === "__proto__") {
+              if (!hasOwn.call(obj, name)) {
+                return void 0;
+              } else if (gOPD) {
+                return gOPD(obj, name).value;
+              }
+            }
+            return obj[name];
+          };
           module2.exports = function extend() {
             var options, name, src, copy, copyIsArray, clone;
             var target = arguments[0];
@@ -610,8 +650,8 @@ var quill = { exports: {} };
               options = arguments[i];
               if (options != null) {
                 for (name in options) {
-                  src = target[name];
-                  copy = options[name];
+                  src = getProperty(target, name);
+                  copy = getProperty(options, name);
                   if (target !== copy) {
                     if (deep && copy && (isPlainObject(copy) || (copyIsArray = isArray(copy)))) {
                       if (copyIsArray) {
@@ -620,9 +660,9 @@ var quill = { exports: {} };
                       } else {
                         clone = src && isPlainObject(src) ? src : {};
                       }
-                      target[name] = extend(deep, clone, copy);
+                      setProperty(target, { name, newValue: extend(deep, clone, copy) });
                     } else if (typeof copy !== "undefined") {
-                      target[name] = copy;
+                      setProperty(target, { name, newValue: copy });
                     }
                   }
                 }
@@ -826,9 +866,9 @@ var quill = { exports: {} };
               }
             }, {
               key: "insertBefore",
-              value: function insertBefore(blot, ref) {
+              value: function insertBefore(blot, ref2) {
                 var head = this.children.head;
-                _get(Block2.prototype.__proto__ || Object.getPrototypeOf(Block2.prototype), "insertBefore", this).call(this, blot, ref);
+                _get(Block2.prototype.__proto__ || Object.getPrototypeOf(Block2.prototype), "insertBefore", this).call(this, blot, ref2);
                 if (head instanceof _break2.default) {
                   head.remove();
                 }
@@ -844,8 +884,8 @@ var quill = { exports: {} };
               }
             }, {
               key: "moveChildren",
-              value: function moveChildren(target, ref) {
-                _get(Block2.prototype.__proto__ || Object.getPrototypeOf(Block2.prototype), "moveChildren", this).call(this, target, ref);
+              value: function moveChildren(target, ref2) {
+                _get(Block2.prototype.__proto__ || Object.getPrototypeOf(Block2.prototype), "moveChildren", this).call(this, target, ref2);
                 this.cache = {};
               }
             }, {
@@ -1460,7 +1500,7 @@ var quill = { exports: {} };
           };
           Quill2.events = _emitter4.default.events;
           Quill2.sources = _emitter4.default.sources;
-          Quill2.version = "1.3.6";
+          Quill2.version = "1.3.7";
           Quill2.imports = {
             "delta": _quillDelta2.default,
             "parchment": _parchment2.default,
@@ -3307,9 +3347,9 @@ var quill = { exports: {} };
             }
             _createClass(Break2, [{
               key: "insertInto",
-              value: function insertInto(parent, ref) {
+              value: function insertInto(parent, ref2) {
                 if (parent.children.length === 0) {
-                  _get(Break2.prototype.__proto__ || Object.getPrototypeOf(Break2.prototype), "insertInto", this).call(this, parent, ref);
+                  _get(Break2.prototype.__proto__ || Object.getPrototypeOf(Break2.prototype), "insertInto", this).call(this, parent, ref2);
                 } else {
                   this.remove();
                 }
@@ -3722,8 +3762,8 @@ var quill = { exports: {} };
                 return [this.parent.domNode, offset];
               };
               LeafBlot2.prototype.value = function() {
-                return _a = {}, _a[this.statics.blotName] = this.statics.value(this.domNode) || true, _a;
                 var _a;
+                return _a = {}, _a[this.statics.blotName] = this.statics.value(this.domNode) || true, _a;
               };
               LeafBlot2.scope = Registry.Scope.INLINE_BLOT;
               return LeafBlot2;
@@ -3864,6 +3904,21 @@ var quill = { exports: {} };
             }
             return "retain";
           };
+          Iterator.prototype.rest = function() {
+            if (!this.hasNext()) {
+              return [];
+            } else if (this.offset === 0) {
+              return this.ops.slice(this.index);
+            } else {
+              var offset = this.offset;
+              var index = this.index;
+              var next = this.next();
+              var rest = this.ops.slice(this.index);
+              this.offset = offset;
+              this.index = index;
+              return [next].concat(rest);
+            }
+          };
           module2.exports = lib;
         },
         /* 21 */
@@ -3939,7 +3994,11 @@ var quill = { exports: {} };
                 } else if (clone2.__isDate(parent2)) {
                   child = new Date(parent2.getTime());
                 } else if (useBuffer && Buffer.isBuffer(parent2)) {
-                  child = new Buffer(parent2.length);
+                  if (Buffer.allocUnsafe) {
+                    child = Buffer.allocUnsafe(parent2.length);
+                  } else {
+                    child = new Buffer(parent2.length);
+                  }
                   parent2.copy(child);
                   return child;
                 } else if (_instanceof(parent2, Error)) {
@@ -4233,8 +4292,8 @@ var quill = { exports: {} };
                       last.split(_newlineIndex + 1);
                     }
                   }
-                  var ref = last.children.head instanceof _break2.default ? null : last.children.head;
-                  first.moveChildren(last, ref);
+                  var ref2 = last.children.head instanceof _break2.default ? null : last.children.head;
+                  first.moveChildren(last, ref2);
                   first.remove();
                 }
                 this.optimize();
@@ -4277,13 +4336,13 @@ var quill = { exports: {} };
               }
             }, {
               key: "insertBefore",
-              value: function insertBefore(blot, ref) {
+              value: function insertBefore(blot, ref2) {
                 if (blot.statics.scope === _parchment2.default.Scope.INLINE_BLOT) {
                   var wrapper = _parchment2.default.create(this.statics.defaultChild);
                   wrapper.appendChild(blot);
                   blot = wrapper;
                 }
-                _get(Scroll2.prototype.__proto__ || Object.getPrototypeOf(Scroll2.prototype), "insertBefore", this).call(this, blot, ref);
+                _get(Scroll2.prototype.__proto__ || Object.getPrototypeOf(Scroll2.prototype), "insertBefore", this).call(this, blot, ref2);
               }
             }, {
               key: "leaf",
@@ -5438,6 +5497,7 @@ var quill = { exports: {} };
                 var node = _get(Link2.__proto__ || Object.getPrototypeOf(Link2), "create", this).call(this, value);
                 value = this.sanitize(value);
                 node.setAttribute("href", value);
+                node.setAttribute("rel", "noopener noreferrer");
                 node.setAttribute("target", "_blank");
                 return node;
               }
@@ -5819,8 +5879,8 @@ var quill = { exports: {} };
               };
               ShadowBlot2.prototype.insertAt = function(index, value, def) {
                 var blot = def == null ? Registry.create("text", value) : Registry.create(value, def);
-                var ref = this.split(index);
-                this.parent.insertBefore(blot, ref);
+                var ref2 = this.split(index);
+                this.parent.insertBefore(blot, ref2);
               };
               ShadowBlot2.prototype.insertInto = function(parentBlot, refBlot) {
                 if (refBlot === void 0) {
@@ -9867,7 +9927,7 @@ var quill = { exports: {} };
             }]);
             return SnowTooltip2;
           }(_base.BaseTooltip);
-          SnowTooltip.TEMPLATE = ['<a class="ql-preview" target="_blank" href="about:blank"></a>', '<input type="text" data-formula="e=mc^2" data-link="https://quilljs.com" data-video="Embed URL">', '<a class="ql-action"></a>', '<a class="ql-remove"></a>'].join("");
+          SnowTooltip.TEMPLATE = ['<a class="ql-preview" rel="noopener noreferrer" target="_blank" href="about:blank"></a>', '<input type="text" data-formula="e=mc^2" data-link="https://quilljs.com" data-video="Embed URL">', '<a class="ql-action"></a>', '<a class="ql-remove"></a>'].join("");
           exports2.default = SnowTheme;
         },
         /* 63 */
@@ -10389,11 +10449,11 @@ var quill = { exports: {} };
               }
             }, {
               key: "insertBefore",
-              value: function insertBefore(blot, ref) {
+              value: function insertBefore(blot, ref2) {
                 if (blot instanceof ListItem) {
-                  _get(List2.prototype.__proto__ || Object.getPrototypeOf(List2.prototype), "insertBefore", this).call(this, blot, ref);
+                  _get(List2.prototype.__proto__ || Object.getPrototypeOf(List2.prototype), "insertBefore", this).call(this, blot, ref2);
                 } else {
-                  var index = ref == null ? this.length() : ref.offset(this);
+                  var index = ref2 == null ? this.length() : ref2.offset(this);
                   var after = this.split(index);
                   after.parent.insertBefore(blot, after);
                 }
@@ -11572,39 +11632,577 @@ var quill = { exports: {} };
 })(quill);
 var quillExports = quill.exports;
 const Quill = /* @__PURE__ */ getDefaultExportFromCjs(quillExports);
-const _withScopeId = (n) => (pushScopeId("data-v-1612db8f"), n = n(), popScopeId(), n);
-const _hoisted_1 = { class: "quill-editor" };
-const _hoisted_2 = /* @__PURE__ */ _withScopeId(() => /* @__PURE__ */ createElementVNode("div", { id: "vite-quill-editor" }, null, -1));
-const _hoisted_3 = [
-  _hoisted_2
+const toolbarTitle = [
+  ["bold", "italic", "strike", "underline"]
+  // ['blockquote', 'code-block'],
+  // [{ 'header': 1 }, { 'header': 2 }],
+  // [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+  // [{ 'script': 'sub' }, { 'script': 'super' }],
+  // [{ 'indent': '-1' }, { 'indent': '+1' }],
+  // [{ 'direction': 'rtl' }],
+  // [{ 'size': ['small', false, 'large', 'huge'] }],
+  // [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+  // [{ 'color': [] }, { 'background': [] }],
+  // [{ 'font': [] }],
+  // [{ 'align': [] }],
+  // ['clean'],
+  // ['link', 'image', 'formula']
 ];
-const _sfc_main = /* @__PURE__ */ defineComponent({
-  __name: "quillEditor",
-  setup(__props, { expose: __expose }) {
-    onMounted(() => {
-      const options = {
-        debug: "info",
-        modules: {
-          toolbar: [
-            // 默认的
-            [{ header: [1, 2, 3, false] }],
-            ["bold", "italic", "underline", "link"],
-            [{ list: "ordered" }, { list: "bullet" }],
-            ["clean"],
-            ["image"]
-          ]
-        },
-        placeholder: "请输入文本",
-        // 是否禁止编辑
-        readOnly: false,
-        theme: "snow"
-      };
-      const editor = new Quill("#vite-quill-editor", options);
-      console.log(editor);
-    });
-    __expose({});
+const _hoisted_1$9 = {
+  width: "11",
+  height: "14",
+  viewBox: "0 0 11 14",
+  fill: "none",
+  xmlns: "http://www.w3.org/2000/svg"
+};
+const _hoisted_2$8 = ["opacity"];
+const _hoisted_3$7 = ["stroke"];
+const _hoisted_4$7 = ["stroke"];
+const _sfc_main$9 = /* @__PURE__ */ defineComponent({
+  __name: "bold",
+  props: {
+    color: {
+      type: String,
+      default: "#516082"
+    },
+    ash: {
+      type: Boolean,
+      default: () => false
+    }
+  },
+  setup(__props) {
+    const props = __props;
     return (_ctx, _cache) => {
-      return openBlock(), createElementBlock("div", _hoisted_1, _hoisted_3);
+      return openBlock(), createElementBlock("svg", _hoisted_1$9, [
+        createElementVNode("g", {
+          id: "Group 1312317163",
+          opacity: props.ash ? "0.4" : "1"
+        }, [
+          createElementVNode("path", {
+            id: "Rectangle 34626143",
+            d: "M1 1H6C7.65685 1 9 2.34315 9 4V4C9 5.65685 7.65685 7 6 7H1V1Z",
+            stroke: props.color,
+            "stroke-width": "2",
+            "stroke-linecap": "round"
+          }, null, 8, _hoisted_3$7),
+          createElementVNode("path", {
+            id: "Rectangle 34626144",
+            d: "M1 7H7C8.65685 7 10 8.34315 10 10V10C10 11.6569 8.65685 13 7 13H1V7Z",
+            stroke: props.color,
+            "stroke-width": "2",
+            "stroke-linecap": "round"
+          }, null, 8, _hoisted_4$7)
+        ], 8, _hoisted_2$8)
+      ]);
+    };
+  }
+});
+const _hoisted_1$8 = {
+  width: "24",
+  height: "24",
+  viewBox: "0 0 24 24",
+  fill: "none",
+  xmlns: "http://www.w3.org/2000/svg"
+};
+const _hoisted_2$7 = ["opacity"];
+const _hoisted_3$6 = ["stroke"];
+const _hoisted_4$6 = ["stroke"];
+const _hoisted_5$4 = ["stroke"];
+const _sfc_main$8 = /* @__PURE__ */ defineComponent({
+  __name: "italic",
+  props: {
+    color: {
+      type: String,
+      default: "#516082"
+    },
+    ash: {
+      type: Boolean,
+      default: () => false
+    }
+  },
+  setup(__props) {
+    const props = __props;
+    return (_ctx, _cache) => {
+      return openBlock(), createElementBlock("svg", _hoisted_1$8, [
+        createElementVNode("g", {
+          id: "8",
+          opacity: props.ash ? "0.4" : "1"
+        }, [
+          createElementVNode("path", {
+            id: "Vector",
+            d: "M10.4465 5.00662H16.6605",
+            stroke: props.color,
+            "stroke-width": "1.4",
+            "stroke-linecap": "round",
+            "stroke-linejoin": "round"
+          }, null, 8, _hoisted_3$6),
+          createElementVNode("path", {
+            id: "Vector_2",
+            d: "M7.3396 18.988H13.5535",
+            stroke: props.color,
+            "stroke-width": "1.4",
+            "stroke-linecap": "round",
+            "stroke-linejoin": "round"
+          }, null, 8, _hoisted_4$6),
+          createElementVNode("path", {
+            id: "Vector_3",
+            d: "M13.9421 4.98804L10.0583 18.988",
+            stroke: props.color,
+            "stroke-width": "1.4",
+            "stroke-linecap": "round",
+            "stroke-linejoin": "round"
+          }, null, 8, _hoisted_5$4)
+        ], 8, _hoisted_2$7)
+      ]);
+    };
+  }
+});
+const _hoisted_1$7 = {
+  width: "24",
+  height: "24",
+  viewBox: "0 0 24 24",
+  fill: "none",
+  xmlns: "http://www.w3.org/2000/svg"
+};
+const _hoisted_2$6 = ["opacity"];
+const _hoisted_3$5 = ["stroke"];
+const _hoisted_4$5 = ["stroke"];
+const _hoisted_5$3 = ["stroke"];
+const _hoisted_6$2 = ["stroke"];
+const _sfc_main$7 = /* @__PURE__ */ defineComponent({
+  __name: "strike",
+  props: {
+    color: {
+      type: String,
+      default: "#516082"
+    },
+    ash: {
+      type: Boolean,
+      default: () => false
+    }
+  },
+  setup(__props) {
+    const props = __props;
+    return (_ctx, _cache) => {
+      return openBlock(), createElementBlock("svg", _hoisted_1$7, [
+        createElementVNode("g", {
+          id: "006",
+          opacity: props.ash ? "0.4" : "1"
+        }, [
+          createElementVNode("path", {
+            id: "Vector",
+            d: "M4.3999 12H19.5999",
+            stroke: props.color,
+            "stroke-width": "1.4",
+            "stroke-linecap": "round",
+            "stroke-linejoin": "round"
+          }, null, 8, _hoisted_3$5),
+          createElementVNode("path", {
+            id: "Vector_2",
+            d: "M11.9999 12C18.3999 14.4 15.9999 20 11.9999 20C7.99991 20 7.19995 16.8 7.19995 16.8",
+            stroke: props.color,
+            "stroke-width": "1.4",
+            "stroke-linecap": "round",
+            "stroke-linejoin": "round"
+          }, null, 8, _hoisted_4$5),
+          createElementVNode("path", {
+            id: "Vector_3",
+            d: "M16.8 7.2C16.8 7.2 15.6 4 12 4C8.39997 4 6.97437 7.0398 8.64385 9.6",
+            stroke: props.color,
+            "stroke-width": "1.4",
+            "stroke-linecap": "round",
+            "stroke-linejoin": "round"
+          }, null, 8, _hoisted_5$3),
+          createElementVNode("path", {
+            id: "Vector_4",
+            d: "M7.19995 16.8C7.19995 16.8 8.79991 20 11.9999 20C15.1999 20 17.0255 16.9602 15.3561 14.4",
+            stroke: props.color,
+            "stroke-width": "1.4",
+            "stroke-linecap": "round",
+            "stroke-linejoin": "round"
+          }, null, 8, _hoisted_6$2)
+        ], 8, _hoisted_2$6)
+      ]);
+    };
+  }
+});
+const _hoisted_1$6 = {
+  width: "24",
+  height: "24",
+  viewBox: "0 0 24 24",
+  fill: "none",
+  xmlns: "http://www.w3.org/2000/svg"
+};
+const _hoisted_2$5 = ["opacity"];
+const _hoisted_3$4 = ["stroke"];
+const _hoisted_4$4 = ["stroke"];
+const _sfc_main$6 = /* @__PURE__ */ defineComponent({
+  __name: "underline",
+  props: {
+    color: {
+      type: String,
+      default: "#516082"
+    },
+    ash: {
+      type: Boolean,
+      default: () => false
+    }
+  },
+  setup(__props) {
+    const props = __props;
+    return (_ctx, _cache) => {
+      return openBlock(), createElementBlock("svg", _hoisted_1$6, [
+        createElementVNode("g", {
+          id: "007",
+          opacity: props.ash ? "0.4" : "1"
+        }, [
+          createElementVNode("path", {
+            id: "Vector",
+            d: "M6.09009 19.5243H17.9098",
+            stroke: props.color,
+            "stroke-width": "1.4",
+            "stroke-linecap": "round",
+            "stroke-linejoin": "round"
+          }, null, 8, _hoisted_3$4),
+          createElementVNode("path", {
+            id: "Vector_2",
+            d: "M16.8018 5.52429C16.8018 7.98672 16.8018 8.93587 16.8018 11.3983C16.8018 14.0503 14.6519 16.2001 12 16.2001C9.34806 16.2001 7.19824 14.0503 7.19824 11.3983C7.19824 8.93587 7.19824 7.98672 7.19824 5.52429",
+            stroke: props.color,
+            "stroke-width": "1.4",
+            "stroke-linecap": "round"
+          }, null, 8, _hoisted_4$4)
+        ], 8, _hoisted_2$5)
+      ]);
+    };
+  }
+});
+const _hoisted_1$5 = {
+  width: "24",
+  height: "24",
+  viewBox: "0 0 24 24",
+  fill: "none",
+  xmlns: "http://www.w3.org/2000/svg"
+};
+const _hoisted_2$4 = ["opacity"];
+const _hoisted_3$3 = ["fill"];
+const _hoisted_4$3 = ["fill"];
+const _sfc_main$5 = /* @__PURE__ */ defineComponent({
+  __name: "blockquote",
+  props: {
+    color: {
+      type: String,
+      default: "#516082"
+    },
+    ash: {
+      type: Boolean,
+      default: () => false
+    }
+  },
+  setup(__props) {
+    const props = __props;
+    return (_ctx, _cache) => {
+      return openBlock(), createElementBlock("svg", _hoisted_1$5, [
+        createElementVNode("g", {
+          id: "Frame",
+          opacity: props.ash ? "0.4" : "1"
+        }, [
+          createElementVNode("path", {
+            id: "Vector",
+            "fill-rule": "evenodd",
+            "clip-rule": "evenodd",
+            d: "M10.8913 6.1933C8.17554 7.93736 6.66684 9.96731 6.36516 12.2831C5.8955 15.8883 9.11954 17.653 10.7531 16.0674C12.3867 14.4819 11.4075 12.4695 10.2246 11.9194C9.04172 11.3692 8.31835 11.5608 8.44453 10.8257C8.57071 10.0906 10.2536 8.05243 11.7321 7.10323C11.8302 7.01982 11.8675 6.85797 11.7731 6.73518C11.7109 6.65444 11.5891 6.49607 11.4075 6.26007C11.2487 6.05369 11.0966 6.06142 10.8913 6.1933Z",
+            fill: props.color
+          }, null, 8, _hoisted_3$3),
+          createElementVNode("path", {
+            id: "Vector_2",
+            "fill-rule": "evenodd",
+            "clip-rule": "evenodd",
+            d: "M17.3824 6.50125C14.6668 8.24531 13.1581 10.2753 12.8564 12.5911C12.3867 16.1963 15.6108 17.9609 17.2444 16.3754C18.878 14.7899 17.8987 12.7774 16.7158 12.2273C15.533 11.6772 14.8095 11.8688 14.9358 11.1337C15.0619 10.3986 16.7448 8.36038 18.2233 7.41119C18.3214 7.32777 18.3587 7.16593 18.2642 7.04313C18.2021 6.96239 18.0803 6.80402 17.8987 6.56802C17.7399 6.36164 17.5878 6.36937 17.3824 6.50125Z",
+            fill: props.color
+          }, null, 8, _hoisted_4$3)
+        ], 8, _hoisted_2$4)
+      ]);
+    };
+  }
+});
+const _hoisted_1$4 = {
+  width: "24",
+  height: "24",
+  viewBox: "0 0 24 24",
+  fill: "none",
+  xmlns: "http://www.w3.org/2000/svg"
+};
+const _hoisted_2$3 = ["opacity"];
+const _hoisted_3$2 = ["stroke"];
+const _hoisted_4$2 = ["stroke"];
+const _hoisted_5$2 = ["stroke"];
+const _hoisted_6$1 = ["stroke"];
+const _sfc_main$4 = /* @__PURE__ */ defineComponent({
+  __name: "link",
+  props: {
+    color: {
+      type: String,
+      default: "#516082"
+    },
+    ash: {
+      type: Boolean,
+      default: () => false
+    }
+  },
+  setup(__props) {
+    const props = __props;
+    return (_ctx, _cache) => {
+      return openBlock(), createElementBlock("svg", _hoisted_1$4, [
+        createElementVNode("g", {
+          id: "27",
+          opacity: props.ash ? "0.4" : "1"
+        }, [
+          createElementVNode("path", {
+            id: "Vector",
+            d: "M12.8375 9.16117L9.43017 5.75383C8.43805 4.76169 6.80762 4.78354 5.7885 5.80264C4.7694 6.82173 4.74754 8.45219 5.73969 9.44431L8.69792 12.4026",
+            stroke: props.color,
+            "stroke-width": "1.4",
+            "stroke-linecap": "round",
+            "stroke-linejoin": "round"
+          }, null, 8, _hoisted_3$2),
+          createElementVNode("path", {
+            id: "Vector_2",
+            d: "M15.3214 11.6329L18.2796 14.5911C19.2718 15.5833 19.2499 17.2137 18.2308 18.2328C17.2117 19.2519 15.5813 19.2738 14.5891 18.2816L11.1818 14.8742",
+            stroke: props.color,
+            "stroke-width": "1.4",
+            "stroke-linecap": "round",
+            "stroke-linejoin": "round"
+          }, null, 8, _hoisted_4$2),
+          createElementVNode("path", {
+            id: "Vector_3",
+            d: "M12.7888 12.8028C13.8079 11.7837 13.8298 10.1533 12.8377 9.16112",
+            stroke: props.color,
+            "stroke-width": "1.4",
+            "stroke-linecap": "round",
+            "stroke-linejoin": "round"
+          }, null, 8, _hoisted_5$2),
+          createElementVNode("path", {
+            id: "Vector_4",
+            d: "M11.1819 11.1837C10.1628 12.2028 10.1409 13.8332 11.133 14.8254",
+            stroke: props.color,
+            "stroke-width": "1.4",
+            "stroke-linecap": "round",
+            "stroke-linejoin": "round"
+          }, null, 8, _hoisted_6$1)
+        ], 8, _hoisted_2$3)
+      ]);
+    };
+  }
+});
+const _hoisted_1$3 = {
+  width: "16",
+  height: "16",
+  viewBox: "0 0 16 16",
+  fill: "none",
+  xmlns: "http://www.w3.org/2000/svg"
+};
+const _hoisted_2$2 = ["opacity"];
+const _hoisted_3$1 = ["stroke"];
+const _hoisted_4$1 = ["stroke"];
+const _hoisted_5$1 = ["stroke"];
+const _sfc_main$3 = /* @__PURE__ */ defineComponent({
+  __name: "image",
+  props: {
+    color: {
+      type: String,
+      default: "#516082"
+    },
+    ash: {
+      type: Boolean,
+      default: () => false
+    }
+  },
+  setup(__props) {
+    const props = __props;
+    return (_ctx, _cache) => {
+      return openBlock(), createElementBlock("svg", _hoisted_1$3, [
+        createElementVNode("g", {
+          id: "Group 427319301",
+          opacity: props.ash ? "0.4" : "1"
+        }, [
+          createElementVNode("rect", {
+            id: "Rectangle 34624674",
+            x: "1",
+            y: "1",
+            width: "14",
+            height: "14",
+            rx: "1.75",
+            stroke: props.color,
+            "stroke-width": "1.4"
+          }, null, 8, _hoisted_3$1),
+          createElementVNode("circle", {
+            id: "Ellipse 1926",
+            cx: "5.20017",
+            cy: "5.19996",
+            r: "0.9",
+            fill: "#516082",
+            stroke: props.color
+          }, null, 8, _hoisted_4$1),
+          createElementVNode("path", {
+            id: "Vector 552",
+            d: "M1.32889 12.8128L9.70142 7.64262C10.1429 7.37002 10.7179 7.47824 11.027 7.89487C12.1396 9.394 14.6 12.7175 15.0004 13.3268",
+            stroke: props.color,
+            "stroke-width": "1.4"
+          }, null, 8, _hoisted_5$1)
+        ], 8, _hoisted_2$2)
+      ]);
+    };
+  }
+});
+const _hoisted_1$2 = {
+  width: "24",
+  height: "24",
+  viewBox: "0 0 24 24",
+  fill: "none",
+  xmlns: "http://www.w3.org/2000/svg"
+};
+const _hoisted_2$1 = ["opacity"];
+const _hoisted_3 = /* @__PURE__ */ createElementVNode("mask", {
+  id: "mask0_1336_1603",
+  style: { "mask-type": "luminance" },
+  maskUnits: "userSpaceOnUse",
+  x: "0",
+  y: "0",
+  width: "24",
+  height: "24"
+}, [
+  /* @__PURE__ */ createElementVNode("g", { id: "icon-587d56b37c11bad3" }, [
+    /* @__PURE__ */ createElementVNode("path", {
+      id: "Vector",
+      d: "M24 0H0V24H24V0Z",
+      fill: "white"
+    })
+  ])
+], -1);
+const _hoisted_4 = { mask: "url(#mask0_1336_1603)" };
+const _hoisted_5 = { id: "Group" };
+const _hoisted_6 = ["stroke"];
+const _hoisted_7 = ["stroke"];
+const _hoisted_8 = ["stroke"];
+const _sfc_main$2 = /* @__PURE__ */ defineComponent({
+  __name: "clean",
+  props: {
+    color: {
+      type: String,
+      default: "#516082"
+    },
+    ash: {
+      type: Boolean,
+      default: () => false
+    }
+  },
+  setup(__props) {
+    const props = __props;
+    return (_ctx, _cache) => {
+      return openBlock(), createElementBlock("svg", _hoisted_1$2, [
+        createElementVNode("g", {
+          id: "Clip path group",
+          opacity: props.ash ? "0.4" : "1"
+        }, [
+          _hoisted_3,
+          createElementVNode("g", _hoisted_4, [
+            createElementVNode("g", _hoisted_5, [
+              createElementVNode("path", {
+                id: "Vector_2",
+                d: "M20.2118 12.0227L15.1568 5.31448L8.1687 10.5804L13.4207 17.0643L14.7393 16.1465L20.2118 12.0227Z",
+                stroke: props.color,
+                "stroke-width": "1.4",
+                "stroke-linejoin": "round"
+              }, null, 8, _hoisted_6),
+              createElementVNode("path", {
+                id: "Vector_3",
+                d: "M13.4206 17.0643L11.9122 18.2726L7.76117 18.2723L6.73927 16.9162L4.21179 13.5621L8.31211 10.4723",
+                stroke: props.color,
+                "stroke-width": "1.4",
+                "stroke-linejoin": "round"
+              }, null, 8, _hoisted_7),
+              createElementVNode("path", {
+                id: "Vector_4",
+                d: "M7.80356 18.2715H20.1267",
+                stroke: props.color,
+                "stroke-width": "1.4",
+                "stroke-linecap": "round"
+              }, null, 8, _hoisted_8)
+            ])
+          ])
+        ], 8, _hoisted_2$1)
+      ]);
+    };
+  }
+});
+const _hoisted_1$1 = { class: "z-toolbar" };
+const _sfc_main$1 = /* @__PURE__ */ defineComponent({
+  __name: "toolbar",
+  props: {
+    getQuill: {
+      type: Function,
+      default: () => {
+      }
+    }
+  },
+  setup(__props) {
+    const props = __props;
+    const onTest = () => {
+      props.getQuill().format("header", 1);
+    };
+    onMounted(() => {
+    });
+    return (_ctx, _cache) => {
+      return openBlock(), createElementBlock("div", _hoisted_1$1, [
+        (openBlock(true), createElementBlock(Fragment, null, renderList(unref(toolbarTitle), (toolbar, index) => {
+          return openBlock(), createElementBlock("div", {
+            class: "z-formats",
+            key: index
+          }, [
+            (openBlock(true), createElementBlock(Fragment, null, renderList(toolbar, (tool) => {
+              return openBlock(), createElementBlock("button", {
+                type: "button",
+                key: tool,
+                class: "icon",
+                onClick: onTest
+              }, [
+                tool === "bold" ? (openBlock(), createBlock(_sfc_main$9, {
+                  key: 0,
+                  color: "#516082"
+                })) : createCommentVNode("", true),
+                tool === "italic" ? (openBlock(), createBlock(_sfc_main$8, {
+                  key: 1,
+                  color: "#516082"
+                })) : createCommentVNode("", true),
+                tool === "strike" ? (openBlock(), createBlock(_sfc_main$7, {
+                  key: 2,
+                  color: "#516082"
+                })) : createCommentVNode("", true),
+                tool === "underline" ? (openBlock(), createBlock(_sfc_main$6, {
+                  key: 3,
+                  color: "#516082"
+                })) : createCommentVNode("", true),
+                tool === "blockquote" ? (openBlock(), createBlock(_sfc_main$5, {
+                  key: 4,
+                  color: "#516082"
+                })) : createCommentVNode("", true),
+                tool === "link" ? (openBlock(), createBlock(_sfc_main$4, {
+                  key: 5,
+                  color: "#516082"
+                })) : createCommentVNode("", true),
+                tool === "image" ? (openBlock(), createBlock(_sfc_main$3, {
+                  key: 6,
+                  color: "#516082"
+                })) : createCommentVNode("", true),
+                tool === "clean" ? (openBlock(), createBlock(_sfc_main$2, {
+                  key: 7,
+                  color: "#516082"
+                })) : createCommentVNode("", true)
+              ]);
+            }), 128))
+          ]);
+        }), 128))
+      ]);
     };
   }
 });
@@ -11615,7 +12213,63 @@ const _export_sfc = (sfc, props) => {
   }
   return target;
 };
-const quillEditor = /* @__PURE__ */ _export_sfc(_sfc_main, [["__scopeId", "data-v-1612db8f"]]);
+const ToolBar = /* @__PURE__ */ _export_sfc(_sfc_main$1, [["__scopeId", "data-v-c8dd16fd"]]);
+const _withScopeId = (n) => (pushScopeId("data-v-6daa6106"), n = n(), popScopeId(), n);
+const _hoisted_1 = { class: "quill-editor" };
+const _hoisted_2 = /* @__PURE__ */ _withScopeId(() => /* @__PURE__ */ createElementVNode("div", { id: "vite-quill-editor" }, null, -1));
+const _sfc_main = /* @__PURE__ */ defineComponent({
+  __name: "quillEditor",
+  props: {
+    // 配置信息
+    options: {
+      type: Object,
+      default: () => {
+      }
+    }
+  },
+  setup(__props, { expose: __expose }) {
+    const quillEditor2 = ref(null);
+    const props = __props;
+    const init = () => {
+      var _a;
+      const options = {
+        // debug: "info", // 是否显示debug信息
+        modules: {
+          toolbar: props.options.modules.toolbar
+        },
+        placeholder: ((_a = props.options) == null ? void 0 : _a.placeholder) || "请输入文本",
+        // 是否禁止编辑
+        readOnly: false,
+        theme: "snow"
+      };
+      const editor = new Quill("#vite-quill-editor", options);
+      quillEditor2.value = editor;
+      quillEditor2.value.on("text-change", (delta, oldDelta, source) => {
+      });
+      quillEditor2.value.on("selection-change", (range, oldRange, source) => {
+      });
+    };
+    const getQuill = () => {
+      return quillEditor2.value;
+    };
+    onMounted(() => {
+      init();
+    });
+    __expose({
+      getQuill
+    });
+    return (_ctx, _cache) => {
+      return openBlock(), createElementBlock("div", _hoisted_1, [
+        createVNode(ToolBar, {
+          toolbar: props.options.modules.toolbar,
+          getQuill
+        }, null, 8, ["toolbar"]),
+        _hoisted_2
+      ]);
+    };
+  }
+});
+const quillEditor = /* @__PURE__ */ _export_sfc(_sfc_main, [["__scopeId", "data-v-6daa6106"]]);
 quillEditor.install = (app) => {
   app.component(quillEditor.__name, quillEditor);
 };
