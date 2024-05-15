@@ -1,28 +1,28 @@
 <template>
   <div class="z-toolbar">
-    <div
-      class="z-formats"
-      v-for="(toolbar, index) in toolbarTitle"
-      :key="index"
-    >
-      <button
-        type="button"
-        v-for="tool in toolbar"
-        :key="tool"
-        class="icon"
-        @click="onTest"
-      >
-        <icon-bold v-if="tool === 'bold'" color="#516082" />
-        <icon-italic v-if="tool === 'italic'" color="#516082" />
-        <icon-strike v-if="tool === 'strike'" color="#516082" />
-        <icon-underline v-if="tool === 'underline'" color="#516082" />
+    <template v-for="(toolbar, index) in toolbarTitle" :key="index">
+      <div class="z-formats">
+        <button
+          type="button"
+          v-for="tool in toolbar"
+          :key="tool"
+          class="icon"
+        >
+          <icon-bold v-if="tool === 'bold'" color="#516082" />
+          <icon-italic v-if="tool === 'italic'" color="#516082" />
+          <icon-strike v-if="tool === 'strike'" color="#516082" />
+          <icon-underline v-if="tool === 'underline'" color="#516082" />
+          <icon-background v-if="tool === 'background'" color="#516082" />
+          <icon-color v-if="tool === 'color'" color="#516082" />
 
-        <icon-blockquote v-if="tool === 'blockquote'" color="#516082" />
-        <icon-link v-if="tool === 'link'" color="#516082" />
-        <icon-image v-if="tool === 'image'" color="#516082" />
-        <icon-clean v-if="tool === 'clean'" color="#516082" />
-      </button>
-    </div>
+          <icon-blockquote v-if="tool === 'blockquote'" color="#516082" />
+          <icon-link v-if="tool === 'link'" color="#516082" />
+          <icon-image v-if="tool === 'image'" color="#516082" />
+          <icon-clean v-if="tool === 'clean'" color="#516082" />
+        </button>
+      </div>
+      <div type="button" class="division-line"></div>
+    </template>
   </div>
 </template>
 
@@ -34,6 +34,8 @@ import IconBold from "../images/svg/bold.vue";
 import IconItalic from "../images/svg/italic.vue";
 import IconStrike from "../images/svg/strike.vue";
 import IconUnderline from "../images/svg/underline.vue";
+import IconBackground from "../images/svg/background.vue";
+import IconColor from "../images/svg/color.vue";
 
 import IconBlockquote from "../images/svg/blockquote.vue";
 import IconLink from "../images/svg/link.vue";
@@ -75,9 +77,9 @@ const props = defineProps({
   },
 });
 
-const onTest = () => {
-  props.getQuill().format("header", 1);
-};
+// const onTest = () => {
+//   props.getQuill().format("header", 1);
+// };
 
 onMounted(() => {});
 </script>
