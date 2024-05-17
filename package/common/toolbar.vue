@@ -7,6 +7,7 @@
           v-for="tool in toolbar"
           :key="tool"
           class="icon"
+          @click="toolbarClick(props.getQuill(),tool)"
         >
           <icon-bold v-if="tool === 'bold'" color="#516082" />
           <icon-italic v-if="tool === 'italic'" color="#516082" />
@@ -41,6 +42,8 @@ import IconBlockquote from "../images/svg/blockquote.vue";
 import IconLink from "../images/svg/link.vue";
 import IconImage from "../images/svg/image.vue";
 import IconClean from "../images/svg/clean.vue";
+
+import { toolbarClick } from "../editor/lk-toolbar";
 
 // interface IToolbar {
 //   // 单个
